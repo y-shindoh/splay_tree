@@ -43,7 +43,8 @@ namespace ys
 		 * @param[in,out]	p	引数 @a n の親ノード
 		 * @param[in]	k	キー
 		 * @param[in]	i	親子のキーの関係 (0: 親が大きい, 1: 同じか子が大きい)
-		 * @param[out]	r	キー @a k を持つノードのうち最初のもの
+		 * @param[out]	r	キー @a k を持つノードの有無
+		 * @return	探索後の処理対象ノード
 		 * @note	簡単にするためzig-zigステップは実装していない。
 		 */
 		static Node<K_, V_>*
@@ -51,7 +52,7 @@ namespace ys
 			 Node<K_, V_>*& p,
 			 const K_& k,
 			 int i,
-			 Node<K_, V_>*& r)
+			 bool& r)
 			{
 				Node<K_, V_>* c(0);
 
@@ -63,7 +64,7 @@ namespace ys
 						n->c_[1-j] = c;
 					}
 					else {
-						r = n;
+						r = true;
 					}
 
 					c = p;
@@ -92,7 +93,7 @@ namespace ys
 			const V_& v)
 			{
 				if (n) {
-					bool i = n->k_ <= k;
+					int i = (int)(n->k_ <= k);
 					n->c_[i] = Add(n->c_[i], k, v);
 				}
 				else {
@@ -123,9 +124,11 @@ namespace ys
 						c = c->c_[0];
 					}
 
-					if (p) p->c_[0] = c->c_[1];
+					if (p) {
+						p->c_[0] = c->c_[1];
+						c->c_[1] = n->c_[1];
+					}
 					c->c_[0] = n->c_[0];
-					c->c_[1] = n->c_[1];
 				}
 				else {
 					c = n->c_[0];
@@ -163,21 +166,19 @@ namespace ys
 		Find(Node<K_, V_>*& n,
 			 const K_& k)
 			{
-				Node<K_, V_>* r(0);
+				bool r(false);
 
 				if (n) {
 					Node<K_, V_>* c;
 					if (k != n->k_) {
 						int i = (int)(k > n->k_);
 						c = Find(n->c_[i], n, k, i, r);
-						if (r) n->c_[1-i] = c;
-					}
-					else {
-						r = n;
+						if (!r) return 0;
+						n->c_[1-i] = c;
 					}
 				}
 
-				return r;
+				return n;
 			}
 
 		/**
