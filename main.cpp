@@ -19,42 +19,36 @@ main()
 {
 	int values[M] = {7, 3, 11, 1, 5, 9, 13, 0, 2, 4, 6, 8, 10, 12, 14};
 	int keys[N] = {2, 0, 8, 13, 5};
-	ys::Node<int, int>* st(0);
-	ys::Node<int, int>* n;
+	ys::SplayTree<unsigned int, unsigned int> st;
 
-	for (int i(0); i < M; ++i) {
-		st = ys::Node<int, int>::Add(st, values[i], i);
-	}
-
-	ys::Node<int, int>::Print(st);
+	for (int i(0); i < M; ++i) st.add(values[i], i);
+	st.print();
 
 	for (int i(0); i < N; ++i) {
-		n = ys::Node<int, int>::Find(st, keys[i]);
-		if (n) {
-			std::printf(">>>> %d: FOUND (%d)\n", keys[i], n->v_);
+		int j = st.find(keys[i]);
+		if (j != decltype(st)::InvalidValue()) {
+			std::printf(">>>> %u: FOUND (%u)\n", keys[i], j);
 		}
 		else {
-			std::printf(">>>> %d: NOT FOUND\n", keys[i]);
+			std::printf(">>>> %u: NOT FOUND\n", keys[i]);
 		}
-		ys::Node<int, int>::Print(st);
+		st.print();
 	}
 
 	std::printf(">>>>\n");
-	st = ys::Node<int, int>::DeleteRoot(st);
-	ys::Node<int, int>::Print(st);
+	st.remove(8);
+	st.print();
 
 	for (int i(0); i < N; ++i) {
-		n = ys::Node<int, int>::Find(st, keys[i]);
-		if (n) {
-			std::printf(">>>> %d: FOUND (%d)\n", keys[i], n->v_);
+		int j = st.find(keys[i]);
+		if (j != decltype(st)::InvalidValue()) {
+			std::printf(">>>> %u: FOUND (%u)\n", keys[i], j);
 		}
 		else {
-			std::printf(">>>> %d: NOT FOUND\n", keys[i]);
+			std::printf(">>>> %u: NOT FOUND\n", keys[i]);
 		}
-		ys::Node<int, int>::Print(st);
+		st.print();
 	}
-
-	ys::Node<int, int>::DeleteAll(st);
 
 	return 0;
 }
