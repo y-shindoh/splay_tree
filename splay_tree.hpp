@@ -57,28 +57,23 @@ namespace ys
 			 * @param[in,out]	p	引数 @a n の親ノード
 			 * @param[in]	k	キー
 			 * @param[in]	i	親子のキーの関係 (0: 親が大きい, 1: 同じか子が大きい)
-			 * @param[out]	r	キー @a k を持つノードの有無
-			 * @return	探索後の処理対象ノード
+			 * @return	探索後の処理対象ノード (探索失敗時は 0 が返る)
 			 * @note	簡単にするためzig-zigステップは実装していない。
 			 */
 			static Node<K_, V_>*
 			Find(Node<K_, V_>* n,
 				 Node<K_, V_>*& p,
 				 const K_& k,
-				 int i,
-				 bool& r)
+				 int i)
 				{
 					Node<K_, V_>* c(0);
 
 					if (n) {
 						if (k != n->k_) {
 							int j = (int)(k > n->k_);
-							c = Find(n->c_[j], n, k, j, r);
-							if (!r) return n;	// not found
+							c = Find(n->c_[j], n, k, j);
+							if (!c) return 0;	// not found
 							n->c_[1-j] = c;
-						}
-						else {
-							r = true;
 						}
 
 						c = p;
@@ -180,14 +175,12 @@ namespace ys
 			Find(Node<K_, V_>*& n,
 				 const K_& k)
 				{
-					bool r(false);
-
 					if (n) {
 						Node<K_, V_>* c;
 						if (k != n->k_) {
 							int i = (int)(k > n->k_);
-							c = Find(n->c_[i], n, k, i, r);
-							if (!r) return 0;
+							c = Find(n->c_[i], n, k, i);
+							if (!c) return 0;
 							n->c_[1-i] = c;
 						}
 					}
